@@ -29,7 +29,9 @@ class MultinomialMM(object):
         for i in range(1, self.len_trials):
             _from = self.data[:,i-1]
             _to = self.data[ :,i]
-            self.trans_probs_estimate[_from, _to]+=1
+            #self.trans_probs_estimate[_from, _to]+=1
+            for j in range(len(_from ) ):
+                self.trans_probs_estimate[ _from[j], _to[j] ] +=1
         
         self.trans_probs_estimate = self._normalize( self.trans_probs_estimate )
         

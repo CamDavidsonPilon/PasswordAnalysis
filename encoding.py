@@ -26,8 +26,8 @@ class EncodingScheme(object):
         def __init__(self, list_of_regex_bins=[], to_append_to_end = None, garbage_bin=False ):
             self.list_of_regex_bins = list_of_regex_bins
             self.to_append_to_end = to_append_to_end
-            self.unique_bins = dict( zip( self.list_of_regex_bins, range( len(list_of_regex_bins) ) ) )
-            self.number_of_bins = 0
+            self.unique_bins = dict()
+            self.number_of_bins = -1
             self.garbage_bin = garbage_bin
             self.realized_bins = dict( zip ( self.list_of_regex_bins, [ set() for i in range(len(list_of_regex_bins) )  ] ) )
             
@@ -88,7 +88,7 @@ class EncodingScheme(object):
                     if re.match( regex, str(item) ):
                         if regex not in self.unique_bins.keys():
                             self.number_of_bins +=1
-                            self.unique_bins[str(item)] = self.number_of_bins 
+                            self.unique_bins[regex] = self.number_of_bins 
                         self.realized_bins[regex].add( item)
                         return self.unique_bins[regex]
                             
