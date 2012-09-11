@@ -1,11 +1,8 @@
 #This implements a simple password creator: creating passwords that a really aweful. This should not be used to create passwords
 
 
-#lets make this easy and make everything lowercase
 import string
 import numpy as np
-from numpy import genfromtxt
-import csv
 import time
  
 from multinomialMM import MultinomialMM
@@ -41,6 +38,9 @@ print time.clock()-start
 
 #generate some fake passwords.
 inv_map = {v:k for k, v in es.unique_bins.items()}
+
+print "".join([ inv_map[s] for s in mmm.sample()[0] ])
+print "".join([ inv_map[s] for s in mmm.sample()[0] ])
 print "".join([ inv_map[s] for s in mmm.sample()[0] ])
 
         
