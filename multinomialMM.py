@@ -1,13 +1,36 @@
 
 import numpy as np
-
+import encoding
 
 class MultinomialMM(object):
-    def __init__(self, min_length=None):
+    """
+    Create and learn a  multinomial Markov model 
+    
+    Attributes:
+        self.data: the data used to fit the model
+        self.unique_elements: the found unique elements of the data
+        self.init_probs_esimate: the probability vector of inital emissions
+        self.trans_probs_estimate: the trasmission probability matrix of going from 
+            emission [row] to emission [col].
+    
+    Methods:
+        self.fit(data, encoded=True)
+        self.sample( n=1)
+        
+    
+    
+    """
+
+    def __init__(self, min_length=None, encoding=None):
         self.min_length = min_length
+        self.encoding = encoding
         
+    def _fit_init(self,data, encoded):    
         
-    def _fit_init(self,data):
+        if not encoded:
+            self.encoding = encoding.EncodingScheme()
+            data = self.encoding.encode(data)
+            
         self.data = data
         self.unique_elements = np.arange( np.unique(data).shape[0] )[None, :]
         self.n_trials, self.len_trials = data.shape
@@ -15,9 +38,18 @@ class MultinomialMM(object):
         self.trans_probs_estimate = np.zeros( (self.unique_elements.shape[1], self.unique_elements.shape[1]) )
 
        
-    def fit(self, data):
-        self._fit_init(data)
-        
+    def fit(self, data, encoded=True):
+        """
+        Fit the model to some data. 
+        Input:
+            Data: a (nxt) numpy array of n samples, each t unit long. The data must have a specific 
+                form to be read in where each possible emission is enumerated starting from 0 
+                (called encoded data).
+            encoded: a boolean representing if the data is encoded. If not, a naive EncodingScheme will be used.
+            
+    
+        """
+        self._fit_init(data, encoded)
         #set intial probabilities estimate
         initial_values = self.data[:,1]
         for i in range(self.unique_elements.shape[1]):
@@ -36,6 +68,10 @@ class MultinomialMM(object):
         self.trans_probs_estimate = self._normalize( self.trans_probs_estimate )
         
     def sample(self, n=1):
+        """
+        Sample the learned model n times.
+        
+        """
         samples = np.empty( (n, self.len_trials) )
         for i in range(n):
             samples[i,:] = self._sample()

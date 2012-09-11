@@ -19,7 +19,16 @@ class EncodingScheme(object):
             garbage_bin: a boolean to include a garbage bin, ie a bin that collects everything not collected.
                 Notes: having garbage_bin to True is pretty much useless if all unique bins is set, ie. 
                        having list_of_regex_bins = []
-
+                       
+        attributes:
+            self.unique_bins: a dictionary of the bins used to encode the data and the encode mapping.
+            self.realized_bins: a dictionary of the bins used to encode the realized data values that
+                                satisfy the bins. Useful for debugging and seeing what garbage is collected
+                                with realized_bins['garbage']
+         
+        Methods:
+            encode(raw_data): returns the encoded data
+            
         """
 
 
