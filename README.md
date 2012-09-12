@@ -8,7 +8,7 @@ encoding.py and EncodingScheme()
 This module contains the *EncodingScheme* class to create computer readable data from a multinomial time series (that means it has finite support). From the 
 docs:
 
-        Encoding_scheme is a class to make Markov model data out of raw data. 
+        EncodingScheme is a class to make Markov model data out of raw data. 
         Input:
             list_of_regex_bins: a list of regular expressions, as strings, representing how to "bin"
                 the raw data. eg: [ '[0-9]', '[a-z]', '[A-Z]' ]
@@ -33,12 +33,15 @@ docs:
         Methods:
             encode(raw_data): returns the encoded data
 
-
 mulitnomialMM.py and MultinomialMM()
 ------------------------------------
 From the docs:
 
-    Create and learn a multinomial Markov model.
+    Create and learn a  multinomial Markov model 
+    Input:
+        encoding: a EncodingScheme class that will process the data prior to fitting. If
+                  no scheme is given, and the data is inputed without encoding, a default 
+                  encoding will be used (all unique binning).
     
     Attributes:
         self.data: the data used to fit the model
@@ -50,5 +53,4 @@ From the docs:
     Methods:
         self.fit(data, encoded=True)
         self.sample( n=1)
-        
-
+        self.decoded_sample(n=1)
