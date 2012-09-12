@@ -5,6 +5,10 @@ import encoding
 class MultinomialMM(object):
     """
     Create and learn a  multinomial Markov model 
+    Input:
+        encoding: a EncodingScheme class that will process the data prior to fitting. If
+                  no scheme is given, and the data is inputed without encoding, a default 
+                  encoding will be used (all unique binning).
     
     Attributes:
         self.data: the data used to fit the model
@@ -16,27 +20,14 @@ class MultinomialMM(object):
     Methods:
         self.fit(data, encoded=True)
         self.sample( n=1)
+        self.decoded_sample(n=1)
         
     
     
     """
-
-    def __init__(self, min_length=None, encoding=None):
-        self.min_length = min_length
+     def __init__(self, encoding=None):
         self.encoding = encoding
         
-    def _fit_init(self,data, encoded):    
-        
-        if not encoded:
-            self.encoding = encoding.EncodingScheme()
-            data = self.encoding.encode(data)
-            
-        self.data = data
-        self.unique_elements = np.arange( np.unique(data).shape[0] )[None, :]
-        self.n_trials, self.len_trials = data.shape
-        self.init_probs_estimate = np.zeros( self.unique_elements.shape[1] )
-        self.trans_probs_estimate = np.zeros( (self.unique_elements.shape[1], self.unique_elements.shape[1]) )
-
        
     def fit(self, data, encoded=True):
         """
@@ -84,19 +75,45 @@ class MultinomialMM(object):
             sample[0, i] = np.argmax(np.random.multinomial( 1, self.trans_probs_estimate[ sample[0,i-1],: ] ) )
         return sample
     
-    
-        
+    def decoded_sample(self, n=1):
+        """return decoded samples based on the encoding scheme"""
+        try:
+            return [ "".join([ self.inv_map[s] for s in self.sample()[0] ]) for i in range(n) ]
+        except:
+            self.inv_map = {v:k for k, v in self.encoding.unique_bins.items()}
+            return [ "".join([ self.inv_map[s] for s in self.sample()[0] ]) for i in range(n) ]
+
     def _normalize(self, array ):
         return array/array.sum(1)[:,None]
             
-
+    def maximum_likelihood_sequence( self ):
+        #TODO
+        ml_sequence = np.zeros( (1, self.len_trials), dtype="int")
+        ml_sequence[0][0] = np.argmax( self.init_probs_estimate)
+        for i in range(1, self.len_trials):
+            ml_sequence[0][i] = np.argmax( self.trans_probs_estimate[ml_sequence[0][i-1],:] )
+        
+        return ml_sequence
 
             
             
                     
             
             
+
+    def _fit_init(self,data, encoded):    
         
+        if not encoded:
+            if not self.encoding:
+                self.encoding = encoding.EncodingScheme()
+            data = self.encoding.encode(data)
+
+            
+        self.data = data
+        self.unique_elements = np.arange( np.unique(data).shape[0] )[None, :]
+        self.n_trials, self.len_trials = data.shape
+        self.init_probs_estimate = np.zeros( self.unique_elements.shape[1] )
+        self.trans_probs_estimate = np.zeros( (self.unique_elements.shape[1], self.unique_elements.shape[1]) )
             
             
             

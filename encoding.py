@@ -4,7 +4,7 @@ import numpy as np
 
 class EncodingScheme(object):
         """
-        Encoding_scheme is a class to make Markov model data out of raw data. 
+        EncodingScheme is a class to make Markov model data out of raw data. 
         Input:
             list_of_regex_bins: a list of regular expressions, as strings, representing how to "bin"
                 the raw data. eg: [ '[0-9]', '[a-z]', '[A-Z]' ]

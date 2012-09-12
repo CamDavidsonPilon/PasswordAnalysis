@@ -8,21 +8,36 @@ import time
 from multinomialMM import MultinomialMM
 from encoding import EncodingScheme
 
+#pretty printing
+np.set_printoptions(precision=3, suppress=True)
 
+
+
+def n_gram_even( s, n=1):
+    #create a (n+1)-gram list of string s
+    return [ s[i-n:i+1] for i in range(n,len(s),n+1)]
+def n_gram_odd( s, n=1):
+    #create a (n+1)-gram list of string s
+    return [ s[i:i+1+n] for i in range(1,len(s),n+1) ]
+
+       
 
      
 
 file = open('linkedin_passwords.txt', 'r')
-start = time.clock()
 data = map( string.strip, file.readlines() )
-print time.clock() - start
+data = map( string.lower, data )
 file.close()
 
 
-#bins = ['[0-9]', '[A-Za-z]', '\s']
+twogramdataEven = map( n_gram_even, data)
+twogramdataOdd = map( n_gram_odd, data)
+
+
+data = twogramdataOdd + twogramdataEven
+#bins = ['[0-9]', '[A-Z]','[a-z]', '\s']
 bins = []
 es = EncodingScheme( bins, to_append_to_end=" ", garbage_bin=True)
-
 
 start = time.clock()
 npdata = es.encode( data )
@@ -43,7 +58,8 @@ print "".join([ inv_map[s] for s in mmm.sample()[0] ])
 print "".join([ inv_map[s] for s in mmm.sample()[0] ])
 print "".join([ inv_map[s] for s in mmm.sample()[0] ])
 
-        
-        
-        
+
+
+
+
         
