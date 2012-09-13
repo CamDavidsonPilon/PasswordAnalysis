@@ -12,6 +12,7 @@ class EncodingScheme(object):
                 Notes: -Try not to overlap bins. 
                        -To specify all unique bins, leave the list empty.
                        -An exception is thrown if a item is not able to be binned.
+                       -To specify some bins, and have everything else unique, 
             to_append_to_end:
                 if the series data is not the same length ( eg: password data), this specifies what to append
                 to end before performing analysis. If not needed, leave as None. This is still buggy.
@@ -38,7 +39,7 @@ class EncodingScheme(object):
             self.unique_bins = dict()
             self.number_of_bins = -1
             self.garbage_bin = garbage_bin
-            self.realized_bins = dict( zip ( self.list_of_regex_bins, [ set() for i in range(len(list_of_regex_bins) )  ] ) )
+            self.realized_bins = dict( zip ( self.list_of_regex_bins, [ set() for i in xrange(len(list_of_regex_bins) )  ] ) )
             
         def encode(self, data):
             """
@@ -55,10 +56,12 @@ class EncodingScheme(object):
                 >> array( [ [0,1,2,1], [1,2,1,0], [0,2,1] ] )
             """
             max_length = self.max_length(data)
-            data = self.append_ends( data, max_length )
-            encoded_data = np.zeros( (len(data), max_length ), dtype="int" )
+            number_of_series = len(data)
+            data = self.append_ends( data, max_length ) #returns a generator
+            encoded_data = np.zeros( (number_of_series, max_length ), dtype="int" )
             
             #iterate through the time series
+            #again, it may be really nice to return an iterator to MultinomialMM
             for row_i,series in enumerate(data):
                 for col_i, item in enumerate(series):
                     encoded_data[row_i, col_i] = self._encode( item )
@@ -71,35 +74,35 @@ class EncodingScheme(object):
             return max( map( len, data ) )
             
         def append_ends( self, data, length):
-            #this entire functions needs to be redone
-            new_data = []
-            if self.to_append_to_end:
-                for series in data:
-                    if len(series)<length:
+            #might make more sense to return an iterator. 
+            for series in data:
+                if len(series)<length:
                         series+= self.to_append_to_end*(length-len(series) ) #this is too specific
-                        new_data.append(series)
-                return new_data
-            else:
-                return data
+                yield series
+
             
         def _encode(self, item):
             
             if not self.list_of_regex_bins:
-                if str(item) not in self.unique_bins.keys():
+                #more efficient in python to use try-else
+                try:
+                    return self.unique_bins[str(item)]
+                except KeyError:
                     #This won't distinguish 1.0 from 1 etc.
                     self.number_of_bins +=1
                     self.unique_bins[str(item)] = self.number_of_bins 
-                #self.realized_bins[str(item)].add( item) #this is probably redudant to have if the all unique bins is on
-                return self.unique_bins[str(item)]
+                    return self.unique_bins[str(item)]
             
             else:
                 for regex in self.list_of_regex_bins:
                     if re.match( regex, str(item) ):
-                        if regex not in self.unique_bins.keys():
+                        try:
+                            return self.unique_bins[regex]
+                        except KeyError:
                             self.number_of_bins +=1
                             self.unique_bins[regex] = self.number_of_bins 
-                        self.realized_bins[regex].add( item)
-                        return self.unique_bins[regex]
+                            self.realized_bins[regex].add( item)
+                            return self.unique_bins[regex]
                             
                 #we didnt collect it. See if garbage bin is enabled.
                 if self.garbage_bin:

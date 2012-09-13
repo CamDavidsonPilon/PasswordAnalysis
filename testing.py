@@ -21,7 +21,14 @@ def n_gram_odd( s, n=1):
     return [ s[i:i+1+n] for i in range(1,len(s),n+1) ]
 
        
+"""The most important single contribution to cracking knowledge came in late 2009, when an SQL injection attack 
+against online games service RockYou.com exposed 32 million plaintext passwords used by its members to log in to 
+their accounts. The passcodes, which came to 14.3 million once duplicates were removed, were posted online; 
+almost overnight, the unprecedented corpus of real-world credentials changed the way whitehat and blackhat 
+hackers alike cracked passwords.
 
+
+"""
      
 
 file = open('linkedin_passwords.txt', 'r')
@@ -30,11 +37,11 @@ data = map( string.lower, data )
 file.close()
 
 
-twogramdataEven = map( n_gram_even, data)
-twogramdataOdd = map( n_gram_odd, data)
+#twogramdataEven = map( n_gram_even, data)
+#twogramdataOdd = map( n_gram_odd, data)
+#data = twogramdataOdd + twogramdataEven
 
 
-data = twogramdataOdd + twogramdataEven
 #bins = ['[0-9]', '[A-Z]','[a-z]', '\s']
 bins = []
 es = EncodingScheme( bins, to_append_to_end=" ", garbage_bin=True)
@@ -44,7 +51,7 @@ npdata = es.encode( data )
 print time.clock()-start
 
 
-mmm = MultinomialMM()
+mmm = MultinomialMM(encoding=es)
 
 start = time.clock()
 mmm.fit(npdata)
@@ -52,11 +59,9 @@ print time.clock()-start
 
 
 #generate some fake passwords.
-inv_map = {v:k for k, v in es.unique_bins.items()}
-
-print "".join([ inv_map[s] for s in mmm.sample()[0] ])
-print "".join([ inv_map[s] for s in mmm.sample()[0] ])
-print "".join([ inv_map[s] for s in mmm.sample()[0] ])
+print "Sample learned passwords:"
+for sample in  mmm.decoded_sample( 3 ):
+    print sample
 
 
 

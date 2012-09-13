@@ -25,7 +25,7 @@ class MultinomialMM(object):
     
     
     """
-     def __init__(self, encoding=None):
+    def __init__(self, encoding=None):
         self.encoding = encoding
         
        
@@ -44,16 +44,17 @@ class MultinomialMM(object):
         #set intial probabilities estimate
         initial_values = self.data[:,1]
         for i in range(self.unique_elements.shape[1]):
-            ele = self.unique_elements[:,i]
-            self.init_probs_estimate[i] = sum( initial_values == ele )
+            self.init_probs_estimate[i] = sum( initial_values == self.unique_elements[:,i] )
         self.init_probs_estimate /= self.n_trials
         
+        list_number_series = range(len(_from ) )
         #set transition probabilities estimate
         for i in range(1, self.len_trials):
+            
             _from = self.data[:,i-1]
             _to = self.data[ :,i]
             #self.trans_probs_estimate[_from, _to]+=1
-            for j in range(len(_from ) ):
+            for j in list_number_series:
                 self.trans_probs_estimate[ _from[j], _to[j] ] +=1
         
         self.trans_probs_estimate = self._normalize( self.trans_probs_estimate )
