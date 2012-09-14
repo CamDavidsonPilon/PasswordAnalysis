@@ -41,6 +41,8 @@ class EncodingScheme(object):
             self.garbage_bin = garbage_bin
             self.realized_bins = dict( zip ( self.list_of_regex_bins, [ set() for i in xrange(len(list_of_regex_bins) )  ] ) )
             
+            
+            
         def encode(self, data):
             """
             This function creates a representation of the data.
@@ -55,24 +57,44 @@ class EncodingScheme(object):
                 eScheme.encode( data)
                 >> array( [ [0,1,2,1], [1,2,1,0], [0,2,1] ] )
             """
-            max_length = self.max_length(data)
-            number_of_series = len(data)
-            data = self.append_ends( data, max_length ) #returns a generator
-            encoded_data = np.zeros( (number_of_series, max_length ), dtype="int" )
+            self._init_encode(data)
+            data = self.append_ends( self.data, self.series_length ) #returns a generator
+            #encoded_data = np.zeros( (number_of_series, self.series_length ), dtype="int" )
             
+            self._create_dict(data)
+            
+            data = self.yield_data() #returns a generator
+
+            return self._encode_generator(data)
             #iterate through the time series
             #again, it may be really nice to return an iterator to MultinomialMM
-            for row_i,series in enumerate(data):
-                for col_i, item in enumerate(series):
-                    encoded_data[row_i, col_i] = self._encode( item )
-            
-            return encoded_data
+ 
         
+        def _encode_generator(self, data):
+           for series in data:
+                encoded_data = np.zeros( self.series_length, dtype="int" ) 
+                for col_i, item in enumerate(series):
+                    encoded_data[col_i] = self._encode( item )
+                yield encoded_data
+        
+        def _create_dict(self, data):
+            for series in data:
+                for item in series:
+                    self._encode( item )
+        
+        def _init_encode(self, data):
+            self.data = data
+            self.series_length = self.max_length(data)
+
         
         
         def max_length(self,data):
             return max( map( len, data ) )
-            
+        
+        def yield_data(self):
+            for series in self.data:
+                yield series
+        
         def append_ends( self, data, length):
             #might make more sense to return an iterator. 
             for series in data:

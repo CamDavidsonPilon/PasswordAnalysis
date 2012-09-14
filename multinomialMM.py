@@ -38,25 +38,20 @@ class MultinomialMM(object):
                 (called encoded data).
             encoded: a boolean representing if the data is encoded. If not, a naive EncodingScheme will be used.
             
-    
+   
         """
+        
         self._fit_init(data, encoded)
-        #set intial probabilities estimate
-        initial_values = self.data[:,1]
-        for i in range(self.unique_elements.shape[1]):
-            self.init_probs_estimate[i] = sum( initial_values == self.unique_elements[:,i] )
-        self.init_probs_estimate /= self.n_trials
-        
-        list_number_series = range(len(_from ) )
-        #set transition probabilities estimate
-        for i in range(1, self.len_trials):
+        list_series_length = range(1, self.len_trials)
+
+        for encoded_series in data:
             
-            _from = self.data[:,i-1]
-            _to = self.data[ :,i]
-            #self.trans_probs_estimate[_from, _to]+=1
-            for j in list_number_series:
-                self.trans_probs_estimate[ _from[j], _to[j] ] +=1
+            self.init_probs_estimate[ encoded_series[0] ] += 1
+            for j in list_series_length:
+                self.trans_probs_estimate[ encoded_series[j-1], encoded_series[j] ] += 1 
         
+            self.number_of_series += 1
+        self.init_probs_estimate = self._normalize( self.init_probs_estimate )
         self.trans_probs_estimate = self._normalize( self.trans_probs_estimate )
         
     def sample(self, n=1):
@@ -81,12 +76,18 @@ class MultinomialMM(object):
         try:
             return [ "".join([ self.inv_map[s] for s in self.sample()[0] ]) for i in range(n) ]
         except:
-            self.inv_map = {v:k for k, v in self.encoding.unique_bins.items()}
+            self.inv_map = dict((v,k) for k, v in self.encoding.unique_bins.iteritems())
             return [ "".join([ self.inv_map[s] for s in self.sample()[0] ]) for i in range(n) ]
 
     def _normalize(self, array ):
-        return array/array.sum(1)[:,None]
-            
+        #normalizes the array to sum to one. The array should be semi-positive
+        try:
+            #2d?
+            return array.astype("float")/array.sum(1)[:,None]
+        except: 
+            #oh, 1d
+            return array.astype("float")/array.sum()
+         
     def maximum_likelihood_sequence( self ):
         #TODO
         ml_sequence = np.zeros( (1, self.len_trials), dtype="int")
@@ -110,11 +111,14 @@ class MultinomialMM(object):
             data = self.encoding.encode(data)
 
             
+        self.number_of_series = 0
         self.data = data
-        self.unique_elements = np.arange( np.unique(data).shape[0] )[None, :]
-        self.n_trials, self.len_trials = data.shape
-        self.init_probs_estimate = np.zeros( self.unique_elements.shape[1] )
-        self.trans_probs_estimate = np.zeros( (self.unique_elements.shape[1], self.unique_elements.shape[1]) )
+        self.unique_elements = np.arange( len( self.encoding.unique_bins)    )[None, :]
+        self.len_trials = self.encoding.series_length
+        
+        #self.n_trials, self.len_trials = data #iterators do not have a defined shape. This might have to be done on the fly.
+        self.init_probs_estimate = np.zeros( self.unique_elements.shape[1], dtype="int" )
+        self.trans_probs_estimate = np.zeros( (self.unique_elements.shape[1], self.unique_elements.shape[1]), dtype="int" )
             
             
             

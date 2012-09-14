@@ -21,15 +21,6 @@ def n_gram_odd( s, n=1):
     return [ s[i:i+1+n] for i in range(1,len(s),n+1) ]
 
        
-"""The most important single contribution to cracking knowledge came in late 2009, when an SQL injection attack 
-against online games service RockYou.com exposed 32 million plaintext passwords used by its members to log in to 
-their accounts. The passcodes, which came to 14.3 million once duplicates were removed, were posted online; 
-almost overnight, the unprecedented corpus of real-world credentials changed the way whitehat and blackhat 
-hackers alike cracked passwords.
-
-
-"""
-     
 
 file = open('linkedin_passwords.txt', 'r')
 data = map( string.strip, file.readlines() )
@@ -37,9 +28,9 @@ data = map( string.lower, data )
 file.close()
 
 
-#twogramdataEven = map( n_gram_even, data)
-#twogramdataOdd = map( n_gram_odd, data)
-#data = twogramdataOdd + twogramdataEven
+twogramdataEven = map( n_gram_even, data)
+twogramdataOdd = map( n_gram_odd, data)
+data = twogramdataOdd + twogramdataEven
 
 
 #bins = ['[0-9]', '[A-Z]','[a-z]', '\s']
