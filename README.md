@@ -1,7 +1,7 @@
 PasswordAnalysis
 ================
 
-This is a description of human-created passwords using markov models. See camdp.com/blogs for a detailed blog post on the subject.
+This is a description of human-created passwords using markov models. See http://camdp.com/blogs/modeling-password-creation for a detailed blog post on the subject.
 
 encoding.py and EncodingScheme()
 --------------------------------
@@ -32,7 +32,7 @@ docs:
                                 with realized_bins['garbage']
          
         Methods:
-            encode(raw_data): returns the encoded data
+            encode(raw_data): returns the encoded data as a generator
 
 mulitnomialMM.py and MultinomialMM()
 ------------------------------------
