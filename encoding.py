@@ -58,10 +58,10 @@ class EncodingScheme(object):
                 
             """
             self._init_encode(data)
-            data = self.append_ends( self.data, self.series_length ) #returns a generator
+            data = self.yield_data() #returns a generator
             self._create_dict(data)
             
-            data = self.yield_data() #returns a generator
+            data = self.append_ends( self.data, self.series_length ) #returns a generator
 
             return self._encode_generator(data)
 
@@ -83,6 +83,13 @@ class EncodingScheme(object):
             self.data = data
             self.series_length = self._max_length(data)
 
+        
+        def decode(self, sample):
+            try:
+                return "".join([ self.inv_map[s] for s in sample ])
+            except:
+                self.inv_map = dict((v,k) for k, v in self.unique_bins.iteritems())
+                return "".join([ self.inv_map[s] for s in sample ]) 
         
         
         def _max_length(self,data):

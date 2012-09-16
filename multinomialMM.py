@@ -71,13 +71,9 @@ class MultinomialMM(object):
             sample[0, i] = np.argmax(np.random.multinomial( 1, self.trans_probs_estimate[ sample[0,i-1],: ] ) )
         return sample
     
-    def decoded_sample(self, n=1):
+    def decode_sample(self, sample):
         """return decoded samples based on the encoding scheme"""
-        try:
-            return [ "".join([ self.inv_map[s] for s in self.sample()[0] ]) for i in range(n) ]
-        except:
-            self.inv_map = dict((v,k) for k, v in self.encoding.unique_bins.iteritems())
-            return [ "".join([ self.inv_map[s] for s in self.sample()[0] ]) for i in range(n) ]
+        return self.encoding.decode( sample )
 
     def _normalize(self, array ):
         #normalizes the array to sum to one. The array should be semi-positive
@@ -97,10 +93,21 @@ class MultinomialMM(object):
         
         return ml_sequence
 
-            
+     
             
                     
-            
+    def sample_conditional(self, k, x):
+        #Sample the process, but at position k, put x.
+        sample = np.empty( (1, self.len_trials) )
+        sample[0,0] = np.argmax( np.random.multinomial( 1, self.init_probs_estimate ) )
+        for i in range(1, k):
+            A = np.linalg.matrix_power( self.trans_probs_estimate, k-i )
+            p = self.trans_probs_estimate[ sample[0,i-1], :]*A[:, x ]
+            p = self._normalize(p)
+            sample[0, i] = np.argmax( np.random.multinomial( 1, p ) )
+        
+        sample[0, k] = x
+        return sample[0, :k+1]
             
 
     def _fit_init(self,data, encoded):    

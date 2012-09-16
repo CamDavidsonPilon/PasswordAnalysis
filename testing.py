@@ -28,9 +28,10 @@ data = map( string.lower, data )
 file.close()
 
 
-twogramdataEven = map( n_gram_even, data)
-twogramdataOdd = map( n_gram_odd, data)
-data = twogramdataOdd + twogramdataEven
+#twogramdataEven = map( n_gram_even, data)
+#twogramdataOdd = map( n_gram_odd, data)
+
+#data = twogramdataOdd + twogramdataEven
 
 
 #bins = ['[0-9]', '[A-Z]','[a-z]', '\s']
@@ -51,8 +52,17 @@ print time.clock()-start
 
 #generate some fake passwords.
 print "Sample learned passwords:"
-for sample in  mmm.decoded_sample( 3 ):
-    print sample
+for sample in  mmm.sample( 5 ):
+    print mmm.decode_sample(sample)
+
+print "Sample conditional passwords:"
+
+print mmm.decode_sample( mmm.sample_conditional( 8, mmm.encoding.unique_bins[" "] ) )
+print mmm.decode_sample( mmm.sample_conditional( 8, mmm.encoding.unique_bins[" "] ) )
+print mmm.decode_sample( mmm.sample_conditional( 8, mmm.encoding.unique_bins[" "] ) )
+print mmm.sample_conditional( 8, mmm.encoding.unique_bins[" "] )
+print mmm.sample_conditional( 8, mmm.encoding.unique_bins[" "] )
+print mmm.sample_conditional( 8, mmm.encoding.unique_bins[" "] )
 
 
 
