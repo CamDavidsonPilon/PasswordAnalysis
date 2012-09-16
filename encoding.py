@@ -28,7 +28,7 @@ class EncodingScheme(object):
                                 with realized_bins['garbage']
          
         Methods:
-            encode(raw_data): returns the encoded data
+            encode(raw_data): returns the encoded data as a generator.
             
         """
 
@@ -47,27 +47,24 @@ class EncodingScheme(object):
             """
             This function creates a representation of the data.
             Input:
-                data: a list of iterables (eg: strings, lists, arrays, np.arrays), all of the same type.
+                data: a list of iterables (eg: strings, lists, arrays, np.arrays).
             output:
-                a 2d numpy array of computer-readable time series
+                a generator of 1d numpy arrays of computer-readable time series, starting at 0 to unique_number of elements.
                 
             ex:
-                eScheme = Encoding_scheme( [] )
+                eScheme = Encoding_scheme( )
                 input = ['data', 'atad', 'dta']
                 eScheme.encode( data)
-                >> array( [ [0,1,2,1], [1,2,1,0], [0,2,1] ] )
+                
             """
             self._init_encode(data)
             data = self.append_ends( self.data, self.series_length ) #returns a generator
-            #encoded_data = np.zeros( (number_of_series, self.series_length ), dtype="int" )
-            
             self._create_dict(data)
             
             data = self.yield_data() #returns a generator
 
             return self._encode_generator(data)
-            #iterate through the time series
-            #again, it may be really nice to return an iterator to MultinomialMM
+
  
         
         def _encode_generator(self, data):
@@ -84,11 +81,11 @@ class EncodingScheme(object):
         
         def _init_encode(self, data):
             self.data = data
-            self.series_length = self.max_length(data)
+            self.series_length = self._max_length(data)
 
         
         
-        def max_length(self,data):
+        def _max_length(self,data):
             return max( map( len, data ) )
         
         def yield_data(self):
@@ -96,7 +93,6 @@ class EncodingScheme(object):
                 yield series
         
         def append_ends( self, data, length):
-            #might make more sense to return an iterator. 
             for series in data:
                 if len(series)<length:
                         series+= self.to_append_to_end*(length-len(series) ) #this is too specific
@@ -104,7 +100,11 @@ class EncodingScheme(object):
 
             
         def _encode(self, item):
+            """
+            This both creates the dictionares/bins and returns the proper encoding.
             
+            
+            """
             if not self.list_of_regex_bins:
                 #more efficient in python to use try-else
                 try:
@@ -140,7 +140,12 @@ class EncodingScheme(object):
                     raise BinningError(item)
                 
                 
+                
+                
+                
+                
 class BinningError( Exception):
+    #thrown if no bin is found for some value.
     def __init__(self, value):
         self.value = value
     

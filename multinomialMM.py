@@ -31,13 +31,13 @@ class MultinomialMM(object):
        
     def fit(self, data, encoded=True):
         """
-        Fit the model to some data. 
+        Fit the model to some data. Estimates the transition and intial probabilities.
         Input:
             Data: a (nxt) numpy array of n samples, each t unit long. The data must have a specific 
                 form to be read in where each possible emission is enumerated starting from 0 
                 (called encoded data).
             encoded: a boolean representing if the data is encoded. If not, a naive EncodingScheme will be used.
-            
+        
    
         """
         
