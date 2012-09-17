@@ -84,30 +84,40 @@ class MultinomialMM(object):
             #oh, 1d
             return array.astype("float")/array.sum()
          
-    def maximum_likelihood_sequence( self ):
-        #TODO
-        ml_sequence = np.zeros( (1, self.len_trials), dtype="int")
-        ml_sequence[0][0] = np.argmax( self.init_probs_estimate)
-        for i in range(1, self.len_trials):
-            ml_sequence[0][i] = np.argmax( self.trans_probs_estimate[ml_sequence[0][i-1],:] )
-        
-        return ml_sequence
+
 
      
-            
-                    
-    def sample_conditional(self, k, x):
-        #Sample the process, but at position k, put x.
+    def __sample_conditional( self, K, X):
+        #K and X are a list, K is increasing positions, min(K)>0
+        # TODO
         sample = np.empty( (1, self.len_trials) )
+        for i,k in enumerate(K):
+            substr = self._sample_conditional( X[i] )
+            pass
+                    
+    def sample_conditional(self, k, x, negate=False):
+        #Sample the process, but at position k, put x (or put NOT x).
+        sample = np.empty( (1, self.len_trials) )
+        negate = int(negate) #0 or 1
         sample[0,0] = np.argmax( np.random.multinomial( 1, self.init_probs_estimate ) )
-        for i in range(1, k):
+        for i in range(1, k + negate):
             A = np.linalg.matrix_power( self.trans_probs_estimate, k-i )
-            p = self.trans_probs_estimate[ sample[0,i-1], :]*A[:, x ]
+            if not negate:
+                p = self.trans_probs_estimate[ sample[0,i-1], :]*A[:, x ]
+            else:
+                p = self.trans_probs_estimate[ sample[0,i-1], :]*(1-A[:, x ])
+
             p = self._normalize(p)
             sample[0, i] = np.argmax( np.random.multinomial( 1, p ) )
         
-        sample[0, k] = x
-        return sample[0, :k+1]
+        if not negate:
+            sample[0, k] = x
+            
+        
+        for i in range(k+ 1, self.len_trials):
+                        sample[0, i] = np.argmax(np.random.multinomial( 1, self.trans_probs_estimate[ sample[0,i-1],: ] ) )
+        return sample
+        
             
 
     def _fit_init(self,data, encoded):    

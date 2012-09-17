@@ -57,9 +57,9 @@ for sample in  mmm.sample( 5 ):
 
 print "Sample conditional passwords:"
 
-print mmm.decode_sample( mmm.sample_conditional( 8, mmm.encoding.unique_bins[" "] ) )
-print mmm.decode_sample( mmm.sample_conditional( 8, mmm.encoding.unique_bins[" "] ) )
-print mmm.decode_sample( mmm.sample_conditional( 8, mmm.encoding.unique_bins[" "] ) )
+print mmm.decode_sample( mmm.sample_conditional( 8, mmm.encoding.unique_bins[" "] )[0] )
+print mmm.decode_sample( mmm.sample_conditional( 8, mmm.encoding.unique_bins[" "] )[0] )
+print mmm.decode_sample( mmm.sample_conditional( 8, mmm.encoding.unique_bins[" "] )[0] )
 print mmm.sample_conditional( 8, mmm.encoding.unique_bins[" "] )
 print mmm.sample_conditional( 8, mmm.encoding.unique_bins[" "] )
 print mmm.sample_conditional( 8, mmm.encoding.unique_bins[" "] )
