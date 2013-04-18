@@ -1,7 +1,9 @@
-PasswordAnalysis
+[Analysis for 14 million passwords](http://camdp.com/blogs/modeling-password-creation)
 ================
 
-This is a description of human-created passwords using markov models. See http://camdp.com/blogs/modeling-password-creation for a detailed blog post on the subject.
+The coding accompanying the analysis of human-created passwords using Markovian models. See [this article](http://camdp.com/blogs/modeling-password-creation) for a detailed blog post on the subject.
+
+---------
 
 encoding.py and EncodingScheme()
 --------------------------------
