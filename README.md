@@ -1,4 +1,4 @@
-[Analysis for 14 million passwords](http://camdp.com/blogs/modeling-password-creation)
+[Analysis of 14 million passwords](http://camdp.com/blogs/modeling-password-creation)
 ================
 
 The coding accompanying the analysis of human-created passwords using Markovian models. See [this article](http://camdp.com/blogs/modeling-password-creation) for a detailed blog post on the subject.
